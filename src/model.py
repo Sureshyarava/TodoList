@@ -33,7 +33,7 @@ class Schema:
             query = """
                     CREATE TABLE IF NOT EXISTS "User" (
                     NAME varchar(50),
-                    EMAIL TEXT,
+                    EMAIL TEXT UNIQUE,
                     ID Integer Primary Key AUTOINCREMENT
                     );
                     """
@@ -51,8 +51,9 @@ class Schema:
             print(query)
             self.cursor.execute(query)
             self.connection.commit()
-        except:
-            raise Exception("Error while inserting into table User")
+            return "Row inserted Successfully"
+        except sqlite3.IntegrityError:
+            return "Email Id is already present. Please Login"
 
     def get_users(self):
         query = f"Select * from User;"
@@ -61,3 +62,25 @@ class Schema:
         result = self.cursor.fetchall()
         for row in result:
             print(row)
+        return result
+
+    def create_todo_item(self, params):
+        try:
+            query = f" INSERT INTO Todo \
+                    (TITLE, DESCRIPTION, CreatedOn, UpdatedOn, Is_Deleted, CreatedBy) Values \
+                    ('{params['title']}', '{params['description']}', datetime('now'),  datetime('now'), 'false', '{params['createdBy']}');"
+            self.cursor.execute(query)
+            self.connection.commit()
+            return "Todo Item successfully created"
+        except Exception:
+            raise Exception("Error while inserting into table")
+
+    def get_todo_list(self):
+        try:
+            query = "Select * from todo"
+            self.cursor.execute(query)
+            self.connection.commit()
+            result = self.cursor.fetchall()
+            return result
+        except:
+            raise Exception("Error in fetching Todo list")
