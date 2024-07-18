@@ -14,7 +14,7 @@ class TodoService:
         result = self.db.get_users()
         response = []
         for i in result:
-            response.append({"name" : i[0], "email" : i[1], "id" : i[2]})
+            response.append({"name": i[0], "email": i[1], "id": i[2]})
         return response
 
     def create_new_todo(self, title, description, createdBy):
@@ -26,3 +26,9 @@ class TodoService:
         response = []
         print(result)
         return result
+
+    def login(self, email):
+        result = self.db.get_email(email)
+        if email in result:
+            return result[2], 200
+        return "Please sign in or recheck email_id you have entered", 400

@@ -84,3 +84,13 @@ class Schema:
             return result
         except:
             raise Exception("Error in fetching Todo list")
+
+    def get_email(self, email):
+        try:
+            query = f"select * from user where email = '{email}'"
+            self.cursor.execute(query)
+            self.connection.commit()
+            result = self.cursor.fetchall()
+            return result
+        except:
+            raise Exception("Error while fetching email")
