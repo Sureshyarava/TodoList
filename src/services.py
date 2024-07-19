@@ -21,14 +21,25 @@ class TodoService:
         params = {"title": title, "description": description, "createdBy": createdBy}
         return self.db.create_todo_item(params)
 
-    def get_todoList(self):
-        result = self.db.get_todo_list()
+    def get_todoList(self, user):
+        result = self.db.get_todo_list(user)
         response = []
-        print(result)
-        return result
+        for row in result:
+            dictionary = {
+                "id": row[0],
+                "title": row[1],
+                "description": row[2]
+            }
+            response.append(dictionary)
+        return response
 
     def login(self, email):
-        result = self.db.get_email(email)
-        if email in result:
-            return result[2], 200
+        result = self.db.login(email)
+        if email in result[0]:
+            return result[0][2], 200
         return "Please sign in or recheck email_id you have entered", 400
+
+    def update_title(self, title, id, user):
+        result = self.db.update_title(title, id, user)
+        return result
+

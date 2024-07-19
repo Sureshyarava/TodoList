@@ -1,8 +1,11 @@
 from flask import Flask, json, request, session
 from .model import Schema
 from .services import TodoService
+import os
 
 app = Flask(__name__)
+random = os.urandom(12).hex()
+app.config['SECRET_KEY'] = random
 
 
 @app.route("/create_user", methods=["POST"])
@@ -24,7 +27,10 @@ def login():
 
 @app.route("/logout", methods=["POST"])
 def logout():
+    if "user" not in session:
+        return json.jsonify({"message": "Please Login first to logout"})
     session.pop("user", None)
+    return json.jsonify({"message": "Successfully Logged out"})
 
 
 @app.route("/get_users")
@@ -35,15 +41,27 @@ def get_users():
 
 @app.route("/create_todo_item", methods=["POST"])
 def create_todo_item():
+    if "user" not in session:
+        return json.jsonify({"message": "Please login to create a todo item"})
     data = request.json
-    response = TodoService().create_new_todo(data["title"], data["description"], data["user"])
-    return json.jsonify(response)
+    response = TodoService().create_new_todo(data["title"], data["description"], session["user"])
+    return json.jsonify({"message": response})
 
+
+@app.route("/update_title", methods=["PUT"])
+def update_title():
+    if "user" not in session:
+        return json.jsonify({"message": "Please login to update"})
+    data = request.json
+    response = TodoService().update_title(data["title"], data["id"], session["user"])
+    return json.jsonify({"message": response})
 
 @app.route("/get_todoList")
 def get_todoList():
-    response = TodoService().get_todoList()
-    return json.jsonify(response)
+    if "user" not in session:
+        return json.jsonify({"message": "Please login to get the list of todos"})
+    response = TodoService().get_todoList(session["user"])
+    return json.jsonify({"todo_list": response})
 
 
 if __name__ == "main":

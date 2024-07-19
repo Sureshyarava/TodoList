@@ -60,8 +60,8 @@ class Schema:
         self.cursor.execute(query)
         self.connection.commit()
         result = self.cursor.fetchall()
-        for row in result:
-            print(row)
+        # for row in result:
+        #     print(row)
         return result
 
     def create_todo_item(self, params):
@@ -75,9 +75,9 @@ class Schema:
         except Exception:
             raise Exception("Error while inserting into table")
 
-    def get_todo_list(self):
+    def get_todo_list(self, user):
         try:
-            query = "Select * from todo"
+            query = f"Select * from todo where createdBy = {user} and Is_Deleted = false order by updatedOn desc "
             self.cursor.execute(query)
             self.connection.commit()
             result = self.cursor.fetchall()
@@ -85,7 +85,7 @@ class Schema:
         except:
             raise Exception("Error in fetching Todo list")
 
-    def get_email(self, email):
+    def login(self, email):
         try:
             query = f"select * from user where email = '{email}'"
             self.cursor.execute(query)
@@ -94,3 +94,12 @@ class Schema:
             return result
         except:
             raise Exception("Error while fetching email")
+
+    def update_title(self, title, id, user):
+        try:
+            query = f"Update table todo set title = {title}, updateOn = datetime('now') where id = {id} and createdBy = {user}"
+            self.cursor.execute(query)
+            self.connection.commit()
+            return "Successful"
+        except:
+            return "Error while updating title"
