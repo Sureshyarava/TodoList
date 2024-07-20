@@ -68,7 +68,7 @@ class Schema:
         try:
             query = f" INSERT INTO Todo \
                     (TITLE, DESCRIPTION, CreatedOn, UpdatedOn, Is_Deleted, CreatedBy) Values \
-                    ('{params['title']}', '{params['description']}', datetime('now'),  datetime('now'), 'false', '{params['createdBy']}');"
+                    ('{params['title']}', '{params['description']}', datetime('now'),  datetime('now'), FALSE, '{params['createdBy']}');"
             self.cursor.execute(query)
             self.connection.commit()
             return "Todo Item successfully created"
@@ -77,7 +77,7 @@ class Schema:
 
     def get_todo_list(self, user):
         try:
-            query = f"Select * from todo where createdBy = {user} and Is_Deleted = false order by updatedOn desc "
+            query = f"Select * from todo where createdBy = {user} and Is_Deleted = FALSE order by updatedOn desc "
             self.cursor.execute(query)
             self.connection.commit()
             result = self.cursor.fetchall()
@@ -95,11 +95,31 @@ class Schema:
         except:
             raise Exception("Error while fetching email")
 
-    def update_title(self, title, id, user):
+    def update(self, title, description, id, user):
         try:
-            query = f"Update table todo set title = {title}, updateOn = datetime('now') where id = {id} and createdBy = {user}"
+            query = ""
+            if description and title:
+                query = (f"Update todo set title = '{title}', description='{description}', UpdatedOn = datetime('now') \
+                         where id = {id} and createdBy = {user}")
+            elif description:
+                query = (f"Update todo set description='{description}', UpdatedOn = datetime('now') \
+                                         where id = {id} and createdBy = {user}")
+            else:
+                query = (f"Update todo set title = '{title}', UpdatedOn = datetime('now') \
+                                         where id = {id} and createdBy = {user}")
             self.cursor.execute(query)
             self.connection.commit()
             return "Successful"
-        except:
-            return "Error while updating title"
+        except Exception as e:
+            print("error is ",e)
+            return "Error while updating"
+
+    def delete(self, id, user):
+        try:
+            query = f"update  todo set Is_Deleted=TRUE where id = {id} and createdBy = {user}"
+            self.cursor.execute(query)
+            self.connection.commit()
+            return "deleted successfully"
+        except Exception as e:
+            print("Error while deleting a todo item")
+            return "error while deleting"

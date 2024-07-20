@@ -39,7 +39,10 @@ class TodoService:
             return result[0][2], 200
         return "Please sign in or recheck email_id you have entered", 400
 
-    def update_title(self, title, id, user):
-        result = self.db.update_title(title, id, user)
+    def update(self, params):
+        result = self.db.update(params["title"], params["description"], params["id"], params["user"])
         return result
 
+    def delete(self, id, user):
+        result = self.db.delete(id, user)
+        return result
