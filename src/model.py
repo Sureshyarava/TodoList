@@ -123,3 +123,13 @@ class Schema:
         except Exception as e:
             print("Error while deleting a todo item")
             return "error while deleting"
+
+    def delete_user(self, email):
+        try:
+            query = "Delete from user where email = ?"
+            self.cursor.execute(query,[email])
+            self.connection.commit()
+            return "User deleted Successfully"
+        except Exception as e:
+            print(e)
+            return "Error while deleting User"

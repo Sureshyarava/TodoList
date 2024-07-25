@@ -46,3 +46,7 @@ class TodoService:
     def delete(self, id, user):
         result = self.db.delete(id, user)
         return result
+
+    def delete_user(self, email):
+        result = self.db.delete_user(email)
+        return result

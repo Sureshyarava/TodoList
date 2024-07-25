@@ -19,6 +19,16 @@ def is_user_logged_in(func):
     return wrapper
 
 
+def is_admin(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        if "admin" in session:
+            return func(*args, **kwargs)
+        return json.jsonify({"message": "Don't try to fool me :) login with admin credentials"}), 401
+
+    return wrapper
+
+
 @app.route("/create_user", methods=["POST"])
 def create_user():
     data = request.json
@@ -31,6 +41,8 @@ def login():
     data = request.json
     response, statuscode = TodoService().login(data["email"])
     if statuscode == 200:
+        if data["email"] == "admin":
+            session["admin"] = response
         session["user"] = response
         return json.jsonify({"message": "Login successful"}), 200
     return json.jsonify({"message": response}), 400
@@ -41,6 +53,8 @@ def login():
 def logout():
     session.pop("user", None)
     session.clear()
+    if "admin" in session:
+        session.pop("admin", None)
     return json.jsonify({"message": "Successfully Logged out"}), 200
 
 
@@ -74,6 +88,14 @@ def update():
 def delete_todo_item():
     data = request.json
     response = TodoService().delete(data["id"], session["user"])
+    return json.jsonify({"message": response}), 200
+
+
+@app.route("/delete_user", methods=["DELETE"])
+@is_admin
+def delete_user():
+    data = request.json
+    response = TodoService().delete_user(data["email"])
     return json.jsonify({"message": response}), 200
 
 
