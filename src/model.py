@@ -51,7 +51,7 @@ class Schema:
             print(query)
             self.cursor.execute(query)
             self.connection.commit()
-            return "Row inserted Successfully"
+            return "User created Successfully"
         except sqlite3.IntegrityError:
             return "Email Id is already present. Please Login"
 
@@ -124,12 +124,12 @@ class Schema:
             print("Error while deleting a todo item")
             return "error while deleting"
 
-    def delete_user(self, email):
+    def delete_user(self, id):
         try:
-            query = "Delete from user where email = ?"
-            self.cursor.execute(query,[email])
+            query = "Delete from user where id = ?"
+            self.cursor.execute(query,[id])
             self.connection.commit()
-            return "User deleted Successfully"
+            return "User deleted Successfully" , 200
         except Exception as e:
             print(e)
-            return "Error while deleting User"
+            return "Error while deleting User" , 400

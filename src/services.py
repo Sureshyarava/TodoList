@@ -35,7 +35,7 @@ class TodoService:
 
     def login(self, email):
         result = self.db.login(email)
-        if email in result[0]:
+        if result and email in result[0]:
             return result[0][2], 200
         return "Please sign in or recheck email_id you have entered", 400
 
@@ -47,6 +47,6 @@ class TodoService:
         result = self.db.delete(id, user)
         return result
 
-    def delete_user(self, email):
-        result = self.db.delete_user(email)
-        return result
+    def delete_user(self, id):
+        result, statuscode = self.db.delete_user(id)
+        return result, statuscode
